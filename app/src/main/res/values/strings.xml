@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">智慧社区党建</string>
+    <string name="app_login">智慧社区党建登录</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">yaninfo@126.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="button1">社区事件上报</string>
+    <string name="button2">个人积分明细</string>
+    <string name="button3">社区党建</string>
+
+    <string name="login_name">请输入账号</string>
+    <string name="login_password">请输入密码</string>
+    <string name="login_fast">快速注册</string>
+    <string name="login_forgetPass">忘记密码?</string>
+    <string name="login">登录</string>
+    <string name="login_third">使用第三方登录</string>
+</resources>
