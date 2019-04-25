@@ -69,11 +69,11 @@ public class LoginActivity extends Activity {
                 final String inputUser = user.getText().toString();
                 final String inputPassword = password.getText().toString();
 
-                if (TextUtils.isEmpty(inputUser)) {
+               /* if (TextUtils.isEmpty(inputUser)) {
                     Toast.makeText(LoginActivity.this, "请输入用户名", Toast.LENGTH_SHORT).show();
                 } else if (TextUtils.isEmpty(inputPassword)) {
                     Toast.makeText(LoginActivity.this, "请输入密码", Toast.LENGTH_SHORT).show();
-                } else {
+                } else*/ {
                     // Handler内部类更新UI
                     @SuppressLint("HandlerLeak") Handler handler = new Handler() {
                         @Override
@@ -93,6 +93,7 @@ public class LoginActivity extends Activity {
                                     break;
                                 default:
                                     Toast.makeText(LoginActivity.this, "连接超时", Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                     break;
                             }
                         }

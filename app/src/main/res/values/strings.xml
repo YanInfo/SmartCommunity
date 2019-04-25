@@ -12,6 +12,7 @@
     <string name="button2">个人积分明细</string>
     <string name="button3">社区党建</string>
 
+    <!--登录-->
     <string name="login_name">请输入账号</string>
     <string name="login_password">请输入密码</string>
     <string name="login_na">   党员账号：</string>
@@ -21,4 +22,8 @@
     <string name="login">登录</string>
     <string name="register">注册</string>
     <string name="login_third">使用第三方登录</string>
+
+    <!--上报-->
+    <string name="report_name">请输入上报内容</string>
+    <string name="report_commit">上传</string>
 </resources>
