@@ -30,6 +30,10 @@
         <activity android:name=".RegisterActivity"/>
 
         <activity android:name=".PartyFragment1"/>
+
+        <activity
+            android:name="com.lzy.imagepicker.ui.ImagePreviewDelActivity"
+            android:theme="@style/ImagePickerThemeFullScreen"/>
     </application>
 
 </manifest>
