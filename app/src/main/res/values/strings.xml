@@ -14,8 +14,11 @@
 
     <string name="login_name">请输入账号</string>
     <string name="login_password">请输入密码</string>
+    <string name="login_na">   党员账号：</string>
+    <string name="login_pas">   党员密码：</string>
     <string name="login_fast">快速注册</string>
     <string name="login_forgetPass">忘记密码?</string>
     <string name="login">登录</string>
+    <string name="register">注册</string>
     <string name="login_third">使用第三方登录</string>
 </resources>

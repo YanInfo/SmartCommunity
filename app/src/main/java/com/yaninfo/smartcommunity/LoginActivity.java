@@ -1,69 +1,145 @@
 package com.yaninfo.smartcommunity;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Handler;
+import android.os.Message;
+import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-/**
- * @Author: zhangyan
- * @Date: 2019/4/19 10:17
- * @Description:
- * @Version: 1.0
- */
-public class LoginActivity extends AppCompatActivity {
+import com.yaninfo.smartcommunity.util.HttpLoginData;
 
-    private Button btn_login = null;
-    private EditText edit_user = null;
-    private EditText edit_password = null;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+
+/**
+ * @author zhangyan
+ * @data 2019/1/10
+ */
+public class LoginActivity extends Activity {
+
+    private EditText user;
+    private EditText password;
+    private Button login;
+    private Button register;
+    private SharedPreferences pref;
+    private CheckBox rembemberPass;
+    public static final String TAG = "LoginActivity";
+    private static final String URLLOGIN = "http://192.168.94.110:8080/login/json/data";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_login);
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
 
-        initView();
-    }
+        //绑定控件
+        init();
 
-    /**
-     * 初始化
-     */
-    private void initView() {
-        btn_login = findViewById(R.id.btn_login);
-        // btn_enter.setOnClickListener(this);
-        edit_user = findViewById(R.id.et_user);
-        edit_password = findViewById(R.id.et_pwd);
-        // 按钮监听
-        btn_login.setOnClickListener(new View.OnClickListener() {
+        //记住密码
+        boolean isRemember = pref.getBoolean("remember_password", false);
+        if (isRemember) {
+            String user1 = pref.getString("user", "");
+            String password1 = pref.getString("password", "");
+            user.setText(user1);
+            password.setText(password1);
+            rembemberPass.setChecked(true);
+        }
 
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+
+            //登录按键的响应
+            public void onClick(View v) {
+
+                // 存储用户名密码的数组
+                String[] data = null;
+                HttpLoginData loginData;
+                final String inputUser = user.getText().toString();
+                final String inputPassword = password.getText().toString();
+
+                if (TextUtils.isEmpty(inputUser)) {
+                    Toast.makeText(LoginActivity.this, "请输入用户名", Toast.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(inputPassword)) {
+                    Toast.makeText(LoginActivity.this, "请输入密码", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Handler内部类更新UI
+                    @SuppressLint("HandlerLeak") Handler handler = new Handler() {
+                        @Override
+                        public void handleMessage(Message msg) {
+                            super.handleMessage(msg);
+                            switch (msg.what) {
+                                case 0:
+                                    Toast.makeText(LoginActivity.this, "服务器连接失败", Toast.LENGTH_SHORT).show();
+                                    break;
+                                case 1:
+                                    Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    LoginActivity.this.finish();
+                                    break;
+                                case 2:
+                                    Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
+                                    break;
+                                default:
+                                    Toast.makeText(LoginActivity.this, "连接超时", Toast.LENGTH_SHORT).show();
+                                    break;
+                            }
+                        }
+                    };
+
+                    data = new String[]{inputUser, inputPassword};
+                    // 实例化数据工具类
+                    loginData = new HttpLoginData();
+                    String jsonString = loginData.stringTojson(data);
+
+                    URL url = null;
+                    try {
+                        url = new URL(URLLOGIN);
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+                    // 利用Http向服务端发送数据
+                    loginData.sendData(jsonString, handler, url);
+                }
+
+            }
+        });
+
+
+        /**
+         * 跳转到注册页面
+         */
+        register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(LoginActivity.this,"登录成功了",Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
+
             }
         });
 
     }
 
     /**
-     * Activity销毁时停止Activity
+     * 初始化
      */
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    /**
-     * 返回重启加载
-     */
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        initView();
+    private void init() {
+        login = findViewById(R.id.login);
+        register = findViewById(R.id.register);
+        user = findViewById(R.id.user);
+        password = findViewById(R.id.password);
+        rembemberPass = findViewById(R.id.remember);
     }
 
 }
