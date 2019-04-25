@@ -8,16 +8,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-
 /**
  * @Author: zhangyan
  * @Date: 2019/4/19 10:17
  * @Description:
  * @Version: 1.0
  */
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class LoginActivity extends AppCompatActivity {
 
-    private Button btn_enter = null;
+    private Button btn_login = null;
     private EditText edit_user = null;
     private EditText edit_password = null;
 
@@ -33,26 +32,25 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      * 初始化
      */
     private void initView() {
-        btn_enter =  findViewById(R.id.btn_enter);
-        btn_enter.setOnClickListener(this);
+        btn_login = findViewById(R.id.btn_login);
+        // btn_enter.setOnClickListener(this);
         edit_user = findViewById(R.id.et_user);
         edit_password = findViewById(R.id.et_pwd);
+        // 按钮监听
+        btn_login.setOnClickListener(new View.OnClickListener() {
 
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.btn_enter:
-                Toast.makeText(this,"登录成功了",Toast.LENGTH_SHORT).show();
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(LoginActivity.this,"登录成功了",Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
-                break;
-        }
+            }
+        });
+
     }
 
     /**
-     * Activity销毁时停止播放
+     * Activity销毁时停止Activity
      */
     @Override
     protected void onStop() {
