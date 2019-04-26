@@ -32,7 +32,7 @@
       tools:listitem="@layout/report_item_image" />
 
   <Button
-      android:id="@+id/btn"
+      android:id="@+id/button"
       android:layout_marginTop="10dp"
       android:layout_width="wrap_content"
       android:layout_height="0dp"

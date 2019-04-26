@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.OkHttpClient;
 
 /**
  * @Author: zhangyan

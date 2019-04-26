@@ -1,12 +1,17 @@
 package com.yaninfo.smartcommunity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 
 import com.lzy.imagepicker.ImagePicker;
 import com.lzy.imagepicker.bean.ImageItem;
@@ -14,15 +19,20 @@ import com.lzy.imagepicker.ui.ImageGridActivity;
 import com.lzy.imagepicker.ui.ImagePreviewDelActivity;
 import com.lzy.imagepicker.view.CropImageView;
 import com.yaninfo.smartcommunity.adapter.ImagePickerAdapter;
+import com.yaninfo.smartcommunity.uploadEvent.BitmapUtils;
 import com.yaninfo.smartcommunity.uploadEvent.GlideImageLoader;
-import com.yaninfo.smartcommunity.uploadEvent.MyStringCallBack;
 import com.yaninfo.smartcommunity.uploadEvent.SelectDialog;
-import com.yaninfo.smartcommunity.util.HttpUtil;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import okhttp3.Call;
 
 /**
  * 事件上报
@@ -36,22 +46,45 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
     private ImagePickerAdapter adapter;
     // 当前选择的所有图片
     private ArrayList<ImageItem> selImageList;
+    private EditText editText;
     // 允许选择图片最大数
     private int maxImgCount = 8;
+    private int imageNum = 0;
+    private int uploadImage = 0;
 
-    private HttpUtil httpUtil;
+    Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            if (msg.what == 1) {
+                uploadImage++;
+                if (imageNum <= uploadImage) {
+                    uploadMessage();
+                }
+            }
+            return false;
+        }
+    });
+
+    private void uploadMessage() {
+
+
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_report);
 
-        httpUtil = new HttpUtil();
+        editText = findViewById(R.id.editText);
+        String getEditText = editText.getText().toString();
 
-        findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 uploadImage(selImageList);
+
             }
         });
 
@@ -161,27 +194,63 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
         }
     }
 
-    private String url = "http:192.168.94.110:8080/upload/testPost";
-
     private void uploadImage(ArrayList<ImageItem> pathList) {
 
-        httpUtil.postRequest(url, null, new MyStringCallBack() {
+        Map<String, File> files = new HashMap<>();
+        for (int i = 0; i < pathList.size(); i++) {
+            String newPath = BitmapUtils.compressImageUpload(pathList.get(i).path);
+            files.put(pathList.get(i).name + i, new File(newPath));
+            bitmap = getBitMap(newPath);
+            new MyThread().start();
+        }
 
-        });
+        // 打印缓存之后存放的文件夹
+        System.out.println("############" + files);
 
-        httpUtil.postFileRequest(url, null, pathList, new MyStringCallBack() {
-
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                super.onError(call, e, id);
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                super.onResponse(response, id);
-                //返回图片的地址
-            }
-        });
     }
+
+    Bitmap bitmap = null;
+
+    /**
+     * 上传线程
+     */
+    class MyThread extends Thread {
+        @Override
+        public void run() {
+            try {
+                Socket s = new Socket("192.168.94.110", 30003);
+                OutputStream os = s.getOutputStream();
+                //将图片bitmap转换成字节数组
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                byte[] data = baos.toByteArray();
+                os.write(data);
+                //刷新缓冲区
+                os.flush();
+                os.close();
+                handler.sendEmptyMessage(1);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    /**
+     * 根据路径转化为Bitmap对象
+     *
+     * @param pathString
+     * @return
+     */
+    private Bitmap getBitMap(String pathString) {
+        Bitmap bitmap = null;
+        File file = new File(pathString);
+        if (file.exists()) {
+            bitmap = BitmapFactory.decodeFile(pathString);
+        }
+        return bitmap;
+    }
+
 
 }
