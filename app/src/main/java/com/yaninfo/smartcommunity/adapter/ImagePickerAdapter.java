@@ -10,7 +10,7 @@ import android.widget.ImageView;
 
 import com.lzy.imagepicker.ImagePicker;
 import com.lzy.imagepicker.bean.ImageItem;
-import com.yaninfo.smartcommunity.PartyFragment1;
+import com.yaninfo.smartcommunity.ReportActivity;
 import com.yaninfo.smartcommunity.R;
 
 import java.util.ArrayList;
@@ -70,7 +70,7 @@ public class ImagePickerAdapter extends RecyclerView.Adapter<ImagePickerAdapter.
 
     @Override
     public SelectedPicViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new SelectedPicViewHolder(mInflater.inflate(R.layout.fragment1_item_image, parent, false));
+        return new SelectedPicViewHolder(mInflater.inflate(R.layout.report_item_image, parent, false));
     }
 
     @Override
@@ -100,7 +100,7 @@ public class ImagePickerAdapter extends RecyclerView.Adapter<ImagePickerAdapter.
             ImageItem item = mData.get(position);
             if (isAdded && position == getItemCount() - 1) {
                 iv_img.setImageResource(R.drawable.selector_image_add);
-                clickPosition = PartyFragment1.IMAGE_ITEM_ADD;
+                clickPosition = ReportActivity.IMAGE_ITEM_ADD;
             } else {
                 ImagePicker.getInstance().getImageLoader().displayImage((Activity) mContext, item.path, iv_img, 0, 0);
                 clickPosition = position;
@@ -109,7 +109,9 @@ public class ImagePickerAdapter extends RecyclerView.Adapter<ImagePickerAdapter.
 
         @Override
         public void onClick(View v) {
-            if (listener != null) listener.onItemClick(v, clickPosition);
+            if (listener != null) {
+                listener.onItemClick(v, clickPosition);
+            }
         }
     }
 }

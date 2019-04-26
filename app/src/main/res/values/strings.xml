@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">智慧社区党建</string>
+    <string name="app_report">社区党建事件上报</string>
     <string name="app_login">智慧社区党建登录</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -26,4 +27,11 @@
     <!--上报-->
     <string name="report_name">请输入上报内容</string>
     <string name="report_commit">上传</string>
+
+    <!--侧滑栏-->
+    <string name="drawer_report">社区事件上报</string>
+    <string name="drawer_integral">积分明细</string>
+    <string name="drawer_other">其它</string>
+    <string name="drawer_enjoy">分享</string>
+    <string name="drawer_about">关于</string>
 </resources>

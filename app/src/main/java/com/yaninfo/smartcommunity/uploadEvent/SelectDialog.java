@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  * 选择对话框
- *
+ * <p>
  * Author: nanchen
  * Email: liushilin520@foxmail.com
  * Date: 2017-03-22  11:38
@@ -47,7 +47,6 @@ public class SelectDialog extends Dialog implements OnClickListener, OnItemClick
 
     /**
      * 取消事件监听接口
-     *
      */
     private SelectDialogCancelListener mCancelListener;
 
@@ -60,25 +59,24 @@ public class SelectDialog extends Dialog implements OnClickListener, OnItemClick
         super(activity, theme);
         mActivity = activity;
         mListener = listener;
-        this.mName=names;
+        this.mName = names;
 
         setCanceledOnTouchOutside(true);
     }
 
     /**
-     * @param activity 调用弹出菜单的activity
-     * @param theme 主题
-     * @param listener 菜单项单击事件
+     * @param activity       调用弹出菜单的activity
+     * @param theme          主题
+     * @param listener       菜单项单击事件
      * @param cancelListener 取消事件
-     * @param names 菜单项名称
-     *
+     * @param names          菜单项名称
      */
-    public SelectDialog(Activity activity, int theme, SelectDialogListener listener, SelectDialogCancelListener cancelListener , List<String> names) {
+    public SelectDialog(Activity activity, int theme, SelectDialogListener listener, SelectDialogCancelListener cancelListener, List<String> names) {
         super(activity, theme);
         mActivity = activity;
         mListener = listener;
         mCancelListener = cancelListener;
-        this.mName=names;
+        this.mName = names;
 
         // 设置是否点击外围不解散
         setCanceledOnTouchOutside(false);
@@ -86,17 +84,16 @@ public class SelectDialog extends Dialog implements OnClickListener, OnItemClick
 
     /**
      * @param activity 调用弹出菜单的activity
-     * @param theme 主题
+     * @param theme    主题
      * @param listener 菜单项单击事件
-     * @param names 菜单项名称
-     * @param title 菜单标题文字
-     *
+     * @param names    菜单项名称
+     * @param title    菜单标题文字
      */
     public SelectDialog(Activity activity, int theme, SelectDialogListener listener, List<String> names, String title) {
         super(activity, theme);
         mActivity = activity;
         mListener = listener;
-        this.mName=names;
+        this.mName = names;
         mTitle = title;
 
         // 设置是否点击外围可解散
@@ -108,7 +105,7 @@ public class SelectDialog extends Dialog implements OnClickListener, OnItemClick
         mActivity = activity;
         mListener = listener;
         mCancelListener = cancelListener;
-        this.mName=names;
+        this.mName = names;
         mTitle = title;
 
         // 设置是否点击外围可解散
@@ -118,7 +115,7 @@ public class SelectDialog extends Dialog implements OnClickListener, OnItemClick
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        View view = getLayoutInflater().inflate(R.layout.fragment1_dialog_select,
+        View view = getLayoutInflater().inflate(R.layout.report_dialog_select,
                 null);
         setContentView(view, new LayoutParams(LayoutParams.FILL_PARENT,
                 LayoutParams.WRAP_CONTENT));
@@ -139,29 +136,29 @@ public class SelectDialog extends Dialog implements OnClickListener, OnItemClick
     }
 
     private void initViews() {
-        DialogAdapter dialogAdapter=new DialogAdapter(mName);
-        ListView dialogList=(ListView) findViewById(R.id.dialog_list);
+        DialogAdapter dialogAdapter = new DialogAdapter(mName);
+        ListView dialogList = findViewById(R.id.dialog_list);
         dialogList.setOnItemClickListener(this);
         dialogList.setAdapter(dialogAdapter);
-        mMBtn_Cancel = (Button) findViewById(R.id.mBtn_Cancel);
-        mTv_Title = (TextView) findViewById(R.id.mTv_Title);
+        mMBtn_Cancel = findViewById(R.id.mBtn_Cancel);
+        mTv_Title = findViewById(R.id.mTv_Title);
 
 
         mMBtn_Cancel.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                if(mCancelListener != null){
+                if (mCancelListener != null) {
                     mCancelListener.onCancelClick(v);
                 }
                 dismiss();
             }
         });
 
-        if(!TextUtils.isEmpty(mTitle) && mTv_Title != null){
+        if (!TextUtils.isEmpty(mTitle) && mTv_Title != null) {
             mTv_Title.setVisibility(View.VISIBLE);
             mTv_Title.setText(mTitle);
-        }else{
+        } else {
             mTv_Title.setVisibility(View.GONE);
         }
     }
@@ -179,13 +176,15 @@ public class SelectDialog extends Dialog implements OnClickListener, OnItemClick
         mListener.onItemClick(parent, view, position, id);
         dismiss();
     }
+
     private class DialogAdapter extends BaseAdapter {
         private List<String> mStrings;
         private Viewholder viewholder;
         private LayoutInflater layoutInflater;
+
         public DialogAdapter(List<String> strings) {
             this.mStrings = strings;
-            this.layoutInflater=mActivity.getLayoutInflater();
+            this.layoutInflater = mActivity.getLayoutInflater();
         }
 
         @Override
@@ -206,12 +205,12 @@ public class SelectDialog extends Dialog implements OnClickListener, OnItemClick
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (null == convertView) {
-                viewholder=new Viewholder();
-                convertView=layoutInflater.inflate(R.layout.fragment1_dialog_item, null);
-                viewholder.dialogItemButton=(TextView) convertView.findViewById(R.id.dialog_item_bt);
+                viewholder = new Viewholder();
+                convertView = layoutInflater.inflate(R.layout.report_dialog_item, null);
+                viewholder.dialogItemButton = convertView.findViewById(R.id.dialog_item_bt);
                 convertView.setTag(viewholder);
-            }else{
-                viewholder=(Viewholder) convertView.getTag();
+            } else {
+                viewholder = (Viewholder) convertView.getTag();
             }
             viewholder.dialogItemButton.setText(mStrings.get(position));
             if (!mUseCustomColor) {

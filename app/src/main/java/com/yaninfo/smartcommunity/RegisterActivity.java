@@ -51,7 +51,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.layout_register);
 
-       //控件绑定
+        //控件绑定
         init();
 
         //注册按钮
@@ -63,46 +63,47 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                 String password1 = loginPassword1.getText().toString();
                 String phone = loginPhone.getText().toString();
 
-                        if (TextUtils.isEmpty(user)) {
-                            //用户名为空
-                            Toast.makeText(RegisterActivity.this, "请输入用户名", Toast.LENGTH_SHORT).show();
-                        } else if (TextUtils.isEmpty(password)) {
-                            Toast.makeText(RegisterActivity.this, "请输入密码", Toast.LENGTH_SHORT).show();
-                        } else if (TextUtils.isEmpty(password1)) {
-                            Toast.makeText(RegisterActivity.this, "请确认密码", Toast.LENGTH_SHORT).show();
-                        } else if (!password.equals(password1)) {
-                            Toast.makeText(RegisterActivity.this, "两次密码不一样，请验证", Toast.LENGTH_SHORT).show();
-                        } else if (TextUtils.isEmpty(phone)) {
-                            Toast.makeText(RegisterActivity.this, "请输入电话", Toast.LENGTH_SHORT).show();
-                        } else {
-                            str= new String[]{user, password1};
+                if (TextUtils.isEmpty(user)) {
+                    //用户名为空
+                    Toast.makeText(RegisterActivity.this, "请输入用户名", Toast.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(password)) {
+                    Toast.makeText(RegisterActivity.this, "请输入密码", Toast.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(password1)) {
+                    Toast.makeText(RegisterActivity.this, "请确认密码", Toast.LENGTH_SHORT).show();
+                } else if (!password.equals(password1)) {
+                    Toast.makeText(RegisterActivity.this, "两次密码不一样，请验证", Toast.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(phone)) {
+                    Toast.makeText(RegisterActivity.this, "请输入电话", Toast.LENGTH_SHORT).show();
+                } else {
+                    str = new String[]{user, password1};
 
-                            Handler handler = new Handler() {
-                                @Override
-                                public void handleMessage(Message msg) {
-                                    super.handleMessage(msg);
-                                    switch (msg.what) {
-                                        case 0:
-                                            Toast.makeText(RegisterActivity.this, "服务器连接失败", Toast.LENGTH_SHORT).show();
-                                            break;
-                                        case 1: Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
-                                            //注册成功跳转到登录页面
-                                            startActivity( new Intent(RegisterActivity.this, LoginActivity.class));
-                                            RegisterActivity.this.finish();
-                                            break;
-                                        case 2:
-                                            Toast.makeText(RegisterActivity.this, "用户已存在", Toast.LENGTH_SHORT).show();
-                                            break;
-                                        case 3:
-                                            Log.e("input error", "url为空");
-                                            break;
-                                        case 4:
-                                            Toast.makeText(RegisterActivity.this, "连接超时", Toast.LENGTH_SHORT).show();
-                                            break;
-                                        default:
-                                    }
-                                }
-                            };
+                    Handler handler = new Handler() {
+                        @Override
+                        public void handleMessage(Message msg) {
+                            super.handleMessage(msg);
+                            switch (msg.what) {
+                                case 0:
+                                    Toast.makeText(RegisterActivity.this, "服务器连接失败", Toast.LENGTH_SHORT).show();
+                                    break;
+                                case 1:
+                                    Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
+                                    //注册成功跳转到登录页面
+                                    startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                                    RegisterActivity.this.finish();
+                                    break;
+                                case 2:
+                                    Toast.makeText(RegisterActivity.this, "用户已存在", Toast.LENGTH_SHORT).show();
+                                    break;
+                                case 3:
+                                    Log.e("input error", "url为空");
+                                    break;
+                                case 4:
+                                    Toast.makeText(RegisterActivity.this, "连接超时", Toast.LENGTH_SHORT).show();
+                                    break;
+                                default:
+                            }
+                        }
+                    };
                            /* OperateData operateData = new OperateData();
                             String jsonString = operateData.stringTojson(str);
                             URL url = null;
@@ -112,7 +113,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                                 e.printStackTrace();
                             }
                             operateData.sendData(jsonString, handler, url);*/
-                        }
+                }
 
                 //保存数据到SharedPreferences
                 SharedPreferences.Editor editor = getSharedPreferences("register", MODE_PRIVATE).edit();
@@ -184,16 +185,17 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
 
 
     /**
-     *
      * 字符数组转json
      */
     private String stringArraytoJson(String[] strings) {
 
-        if (strings == null){return "";}
-        String js = "[{"+"username:"+strings[0]+"password:"+strings[1];
+        if (strings == null) {
+            return "";
+        }
+        String js = "[{" + "username:" + strings[0] + "password:" + strings[1];
         return js;
     }
-    
+
     /**
      * 绑定控件
      */

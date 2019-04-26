@@ -29,7 +29,8 @@
 
         <activity android:name=".RegisterActivity"/>
 
-        <activity android:name=".PartyFragment1"/>
+        <activity android:name=".ReportActivity"
+            android:label="@string/app_name"/>
 
         <activity
             android:name="com.lzy.imagepicker.ui.ImagePreviewDelActivity"
