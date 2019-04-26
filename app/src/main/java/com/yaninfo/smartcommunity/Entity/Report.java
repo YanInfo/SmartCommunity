@@ -1,6 +1,6 @@
 package com.yaninfo.smartcommunity.Entity;
 
-import java.sql.Date;
+import java.io.Serializable;
 
 /**
  * @Author: zhangyan
@@ -8,7 +8,9 @@ import java.sql.Date;
  * @Description:
  * @Version: 1.0
  */
-public class Report {
+public class Report implements Serializable {
+
+    private static final long serialVersionUID = 369840050351775312L;
 
     private int id;
     private String title;
@@ -76,4 +78,25 @@ public class Report {
         this.image2 = image2;
     }
 
+    @Override
+    public String toString() {
+        return "Report{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", time='" + time + '\'' +
+                ", user_id=" + user_id +
+                ", user_name='" + user_name + '\'' +
+                ", image0='" + image0 + '\'' +
+                ", image1='" + image1 + '\'' +
+                ", image2='" + image2 + '\'' +
+                '}';
+    }
+
+
+    public Report(int id, String title,String image0) {
+        this.id = id;
+        this.title = title;
+        this.image0 = image0;
+    }
 }

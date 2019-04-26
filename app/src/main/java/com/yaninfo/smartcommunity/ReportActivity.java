@@ -12,20 +12,24 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.lzy.imagepicker.ImagePicker;
 import com.lzy.imagepicker.bean.ImageItem;
 import com.lzy.imagepicker.ui.ImageGridActivity;
 import com.lzy.imagepicker.ui.ImagePreviewDelActivity;
 import com.lzy.imagepicker.view.CropImageView;
+import com.yaninfo.smartcommunity.Entity.Report;
 import com.yaninfo.smartcommunity.adapter.ImagePickerAdapter;
 import com.yaninfo.smartcommunity.uploadEvent.BitmapUtils;
 import com.yaninfo.smartcommunity.uploadEvent.GlideImageLoader;
 import com.yaninfo.smartcommunity.uploadEvent.SelectDialog;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -49,26 +53,30 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
     private EditText editText;
     // 允许选择图片最大数
     private int maxImgCount = 8;
+    // 当前选择的图片数量
     private int imageNum = 0;
     private int uploadImage = 0;
+
+    private String getEditText;
 
     Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
             if (msg.what == 1) {
                 uploadImage++;
+                               // 上传完图片，再传文本
                 if (imageNum <= uploadImage) {
-                    uploadMessage();
+                    sendandText();
                 }
+
             }
+            if (msg.what == 0x001) {
+                Toast.makeText(ReportActivity.this, "文本发送完成", Toast.LENGTH_SHORT).show();
+            }
+
             return false;
         }
     });
-
-    private void uploadMessage() {
-
-
-    }
 
 
     @Override
@@ -77,14 +85,13 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
         setContentView(R.layout.layout_report);
 
         editText = findViewById(R.id.editText);
-        String getEditText = editText.getText().toString();
+        getEditText = editText.getText().toString();
 
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 uploadImage(selImageList);
-
             }
         });
 
@@ -180,6 +187,7 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
                     selImageList.addAll(images);
                     adapter.setImages(selImageList);
                 }
+                imageNum = images.size();
             }
         } else if (resultCode == ImagePicker.RESULT_CODE_BACK) {
             //预览图片返回
@@ -194,6 +202,10 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
         }
     }
 
+    /**
+     * 上传图片
+     * @param pathList
+     */
     private void uploadImage(ArrayList<ImageItem> pathList) {
 
         Map<String, File> files = new HashMap<>();
@@ -212,7 +224,7 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
     Bitmap bitmap = null;
 
     /**
-     * 上传线程
+     * 上传线程,图片
      */
     class MyThread extends Thread {
         @Override
@@ -228,6 +240,7 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
                 //刷新缓冲区
                 os.flush();
                 os.close();
+                //
                 handler.sendEmptyMessage(1);
 
             } catch (IOException e) {
@@ -236,6 +249,37 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
         }
     }
 
+    /**
+     * 上传文本线程
+     */
+    public void sendandText() {
+        if(getEditText.equals("")) {
+            Toast.makeText(ReportActivity.this, "发送信息不能为空", Toast.LENGTH_SHORT).show();
+        } else {
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        Socket s = new Socket("192.168.94.110", 30001);
+                        BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                        OutputStream os = s.getOutputStream();
+                        os.write((new Report(1, getEditText, "first image").toString() + "\r\n").getBytes());
+                        String content = "";
+                        while((content = br.readLine())!=null) {
+                            Message msg = new Message();
+                            msg.obj = content;
+                            handler.sendMessage(msg);
+                        }
+                        Message msg1 = new Message();
+                        msg1.what = 0x001;
+                        handler.sendMessage(msg1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+        }
+    }
 
     /**
      * 根据路径转化为Bitmap对象
