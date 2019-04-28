@@ -12,11 +12,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-
 /**
  * @Author: zhangyan
  * @Date: 2019/4/25 10:06
- * @Description:
+ * @Description: 这里是利用Okhttp来向服务器发送数据，当然此项目中用的是socket通信
  * @Version: 1.0
  */
 public class HttpUtil {

@@ -6,7 +6,7 @@ import java.io.Serializable;
  * @Author: zhangyan
  * @Date: 2019/4/26 15:10
  * @Description:
- * @Version: 1.0
+ * @Version: 1.0 上报事件实体类，并使用序列化
  */
 public class Report implements Serializable {
 
