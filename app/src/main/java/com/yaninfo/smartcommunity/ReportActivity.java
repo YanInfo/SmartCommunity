@@ -72,15 +72,12 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
         public boolean handleMessage(Message msg) {
             if (msg.what == IMAGE_SEND_FINISHED) {
                 uploadImage++;
-                // 上传完图片，再传文本
-               // if ( imageNum <= uploadImage) {
                 if (uploadImage >= imageNum) {
                     Toast.makeText(ReportActivity.this, "图片发送完成", Toast.LENGTH_SHORT).show();
                     sendandText();
                 }
 
-            }
-            if (msg.what == TEXT_SEND_FINISHED) {
+            } else if (msg.what == TEXT_SEND_FINISHED) {
                 Toast.makeText(ReportActivity.this, "文本发送完成", Toast.LENGTH_SHORT).show();
             }
 
@@ -106,12 +103,14 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
             }
         });
 
-        //最好放到 Application oncreate执行
         initImagePicker();
         initWidget();
 
     }
 
+    /**
+     * 初始化ImagePicker
+     */
     private void initImagePicker() {
         ImagePicker imagePicker = ImagePicker.getInstance();
         imagePicker.setImageLoader(new GlideImageLoader());   // 设置图片加载器
@@ -198,8 +197,6 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
                     selImageList.addAll(images);
                     adapter.setImages(selImageList);
                 }
-                // 图片数量赋值
-                imageNum = images.size();
             }
         } else if (resultCode == ImagePicker.RESULT_CODE_BACK) {
             //预览图片返回
@@ -219,6 +216,9 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
      * @param pathList
      */
     private void uploadImage(ArrayList<ImageItem> pathList) {
+
+        // 图片数量赋值
+        imageNum = selImageList.size();
 
         Map<String, File> files = new HashMap<>();
         for (int i = 0; i < pathList.size(); i++) {
@@ -278,20 +278,13 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
                 public void run() {
                     try {
                         Socket s = new Socket("192.168.94.110", 30001);
-                        BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                        // BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
                         OutputStream os = s.getOutputStream();
 
                         String sendReportEntity = null;
                         sendReportEntity = new Report("党员管理", getEditText, "2019/4/29", 123, "", "" )+ "\r\n";
                         os.write(sendReportEntity.getBytes());
-
-                        String content = "";
-                        while((content = br.readLine())!=null) {
-                            Message msg = new Message();
-                            msg.obj = content;
-                            handler.sendMessage(msg);
-                        }
-                        // 发送Handler，判断文字是否发送完成
+                        // 发送Handler，判断文本发送是否完成
                         handler.sendEmptyMessage(TEXT_SEND_FINISHED);
                     } catch (IOException e) {
                         e.printStackTrace();
