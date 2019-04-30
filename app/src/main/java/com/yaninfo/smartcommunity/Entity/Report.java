@@ -8,9 +8,10 @@ import java.io.Serializable;
  * @Description:
  * @Version: 1.0 上报事件实体类，并使用序列化
  */
+
 public class Report implements Serializable {
 
-    private static final long serialVersionUID = 369840050351775312L;
+    private static final long serialVersionUID = 12L;
 
     private int id;
     private String title;
@@ -93,10 +94,14 @@ public class Report implements Serializable {
                 '}';
     }
 
-
-    public Report(int id, String title,String image0) {
-        this.id = id;
+    public Report(String title, String content, String time, int user_id, String user_name, String image0) {
         this.title = title;
+        this.content = content;
+        this.time = time;
+        this.user_id = user_id;
+        this.user_name = user_name;
         this.image0 = image0;
     }
+
 }
+

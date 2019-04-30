@@ -2,7 +2,6 @@ package com.yaninfo.smartcommunity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -24,6 +23,7 @@ import com.yaninfo.smartcommunity.adapter.ImagePickerAdapter;
 import com.yaninfo.smartcommunity.uploadEvent.BitmapUtils;
 import com.yaninfo.smartcommunity.uploadEvent.GlideImageLoader;
 import com.yaninfo.smartcommunity.uploadEvent.SelectDialog;
+import com.yaninfo.smartcommunity.util.CommonUtil;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -47,6 +47,11 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
     public static final int REQUEST_CODE_SELECT = 100;
     public static final int REQUEST_CODE_PREVIEW = 101;
 
+    // 发送图片handler
+    private static final int IMAGE_SEND_FINISHED = 0x001;
+    // 发送文本handler
+    private static final int TEXT_SEND_FINISHED = 0x002;
+
     private ImagePickerAdapter adapter;
     // 当前选择的所有图片
     private ArrayList<ImageItem> selImageList;
@@ -59,18 +64,23 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
 
     private String getEditText;
 
+    /**
+     * 这里保证图片上传完成之后，再上传文本
+     */
     Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
-            if (msg.what == 1) {
+            if (msg.what == IMAGE_SEND_FINISHED) {
                 uploadImage++;
-                               // 上传完图片，再传文本
-                if (imageNum <= uploadImage) {
+                // 上传完图片，再传文本
+               // if ( imageNum <= uploadImage) {
+                if (uploadImage >= imageNum) {
+                    Toast.makeText(ReportActivity.this, "图片发送完成", Toast.LENGTH_SHORT).show();
                     sendandText();
                 }
 
             }
-            if (msg.what == 0x001) {
+            if (msg.what == TEXT_SEND_FINISHED) {
                 Toast.makeText(ReportActivity.this, "文本发送完成", Toast.LENGTH_SHORT).show();
             }
 
@@ -91,6 +101,7 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
 
             @Override
             public void onClick(View v) {
+                getEditText = editText.getText().toString();
                 uploadImage(selImageList);
             }
         });
@@ -122,7 +133,7 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
         adapter = new ImagePickerAdapter(this, selImageList, maxImgCount);
         adapter.setOnItemClickListener(this);
 
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
     }
@@ -187,6 +198,7 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
                     selImageList.addAll(images);
                     adapter.setImages(selImageList);
                 }
+                // 图片数量赋值
                 imageNum = images.size();
             }
         } else if (resultCode == ImagePicker.RESULT_CODE_BACK) {
@@ -211,8 +223,11 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
         Map<String, File> files = new HashMap<>();
         for (int i = 0; i < pathList.size(); i++) {
             String newPath = BitmapUtils.compressImageUpload(pathList.get(i).path);
-            files.put(pathList.get(i).name + i, new File(newPath));
-            bitmap = getBitMap(newPath);
+
+            // 图片的新路径存到集合中
+            files.put("" + i, new File(newPath));
+            bitmap = CommonUtil.getBitMap(newPath);
+
             new MyThread().start();
         }
 
@@ -220,6 +235,7 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
         System.out.println("############" + files);
 
     }
+
 
     Bitmap bitmap = null;
 
@@ -232,16 +248,17 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
             try {
                 Socket s = new Socket("192.168.94.110", 30003);
                 OutputStream os = s.getOutputStream();
-                //将图片bitmap转换成字节数组
+                // 将图片bitmap转换成字节数组
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                // 第二次压缩图片
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 byte[] data = baos.toByteArray();
                 os.write(data);
                 //刷新缓冲区
                 os.flush();
                 os.close();
-                //
-                handler.sendEmptyMessage(1);
+                // 发送handler，判断图片是否发送完成
+                handler.sendEmptyMessage(IMAGE_SEND_FINISHED);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -263,37 +280,25 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
                         Socket s = new Socket("192.168.94.110", 30001);
                         BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
                         OutputStream os = s.getOutputStream();
-                        os.write((new Report(1, getEditText, "first image").toString() + "\r\n").getBytes());
+
+                        String sendReportEntity = null;
+                        sendReportEntity = new Report("党员管理", getEditText, "2019/4/29", 123, "", "" )+ "\r\n";
+                        os.write(sendReportEntity.getBytes());
+
                         String content = "";
                         while((content = br.readLine())!=null) {
                             Message msg = new Message();
                             msg.obj = content;
                             handler.sendMessage(msg);
                         }
-                        Message msg1 = new Message();
-                        msg1.what = 0x001;
-                        handler.sendMessage(msg1);
+                        // 发送Handler，判断文字是否发送完成
+                        handler.sendEmptyMessage(TEXT_SEND_FINISHED);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             }.start();
         }
-    }
-
-    /**
-     * 根据路径转化为Bitmap对象
-     *
-     * @param pathString
-     * @return
-     */
-    private Bitmap getBitMap(String pathString) {
-        Bitmap bitmap = null;
-        File file = new File(pathString);
-        if (file.exists()) {
-            bitmap = BitmapFactory.decodeFile(pathString);
-        }
-        return bitmap;
     }
 
 
