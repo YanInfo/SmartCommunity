@@ -52,27 +52,31 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
     // 发送文本handler
     private static final int TEXT_SEND_FINISHED = 0x002;
 
+    // 图片适配器
     private ImagePickerAdapter adapter;
     // 当前选择的所有图片
-    private ArrayList<ImageItem> selImageList;
+    private ArrayList<ImageItem> mSelectImageList;
     private EditText editText;
     // 允许选择图片最大数
     private int maxImgCount = 8;
     // 当前选择的图片数量
     private int imageNum = 0;
+    // 图片累加器
     private int uploadImage = 0;
+    // 上传的Bitmap对象
+    private Bitmap mBitmap = null;
 
     private String getEditText;
 
     /**
      * 这里保证图片上传完成之后，再上传文本
      */
-    Handler handler = new Handler(new Handler.Callback() {
+    private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
             if (msg.what == IMAGE_SEND_FINISHED) {
                 uploadImage++;
-                if (uploadImage >= imageNum) {
+                if (imageNum <= uploadImage) {
                     Toast.makeText(ReportActivity.this, "图片发送完成", Toast.LENGTH_SHORT).show();
                     sendandText();
                 }
@@ -99,7 +103,7 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
             @Override
             public void onClick(View v) {
                 getEditText = editText.getText().toString();
-                uploadImage(selImageList);
+                uploadImage(mSelectImageList);
             }
         });
 
@@ -128,8 +132,8 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
 
     private void initWidget() {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        selImageList = new ArrayList<>();
-        adapter = new ImagePickerAdapter(this, selImageList, maxImgCount);
+        mSelectImageList = new ArrayList<>();
+        adapter = new ImagePickerAdapter(this, mSelectImageList, maxImgCount);
         adapter.setOnItemClickListener(this);
 
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
@@ -158,14 +162,14 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
                         switch (position) {
                             case 0: // 直接调起相机
                                 //打开选择,本次允许选择的数量
-                                ImagePicker.getInstance().setSelectLimit(maxImgCount - selImageList.size());
+                                ImagePicker.getInstance().setSelectLimit(maxImgCount - mSelectImageList.size());
                                 Intent intent = new Intent(ReportActivity.this, ImageGridActivity.class);
                                 intent.putExtra(ImageGridActivity.EXTRAS_TAKE_PICKERS, true); // 是否是直接打开相机
                                 startActivityForResult(intent, REQUEST_CODE_SELECT);
                                 break;
                             case 1:
                                 // 打开选择,本次允许选择的数量
-                                ImagePicker.getInstance().setSelectLimit(maxImgCount - selImageList.size());
+                                ImagePicker.getInstance().setSelectLimit(maxImgCount - mSelectImageList.size());
                                 Intent intent1 = new Intent(ReportActivity.this, ImageGridActivity.class);
                                 startActivityForResult(intent1, REQUEST_CODE_SELECT);
                                 break;
@@ -194,8 +198,8 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
             if (data != null && requestCode == REQUEST_CODE_SELECT) {
                 ArrayList<ImageItem> images = (ArrayList<ImageItem>) data.getSerializableExtra(ImagePicker.EXTRA_RESULT_ITEMS);
                 if (images != null) {
-                    selImageList.addAll(images);
-                    adapter.setImages(selImageList);
+                    mSelectImageList.addAll(images);
+                    adapter.setImages(mSelectImageList);
                 }
             }
         } else if (resultCode == ImagePicker.RESULT_CODE_BACK) {
@@ -203,9 +207,9 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
             if (data != null && requestCode == REQUEST_CODE_PREVIEW) {
                 ArrayList<ImageItem> images = (ArrayList<ImageItem>) data.getSerializableExtra(ImagePicker.EXTRA_IMAGE_ITEMS);
                 if (images != null) {
-                    selImageList.clear();
-                    selImageList.addAll(images);
-                    adapter.setImages(selImageList);
+                    mSelectImageList.clear();
+                    mSelectImageList.addAll(images);
+                    adapter.setImages(mSelectImageList);
                 }
             }
         }
@@ -213,12 +217,13 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
 
     /**
      * 上传图片
+     *
      * @param pathList
      */
     private void uploadImage(ArrayList<ImageItem> pathList) {
 
         // 图片数量赋值
-        imageNum = selImageList.size();
+        imageNum = mSelectImageList.size();
 
         Map<String, File> files = new HashMap<>();
         for (int i = 0; i < pathList.size(); i++) {
@@ -226,7 +231,7 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
 
             // 图片的新路径存到集合中
             files.put("" + i, new File(newPath));
-            bitmap = CommonUtil.getBitMap(newPath);
+            mBitmap = CommonUtil.getBitMap(newPath);
 
             new MyThread().start();
         }
@@ -236,8 +241,6 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
 
     }
 
-
-    Bitmap bitmap = null;
 
     /**
      * 上传线程,图片
@@ -251,10 +254,10 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
                 // 将图片bitmap转换成字节数组
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 // 第二次压缩图片
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 byte[] data = baos.toByteArray();
                 os.write(data);
-                //刷新缓冲区
+                // 刷新缓冲区
                 os.flush();
                 os.close();
                 // 发送handler，判断图片是否发送完成
@@ -270,7 +273,7 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
      * 上传文本线程
      */
     public void sendandText() {
-        if(getEditText.equals("")) {
+        if (getEditText.equals("")) {
             Toast.makeText(ReportActivity.this, "发送信息不能为空", Toast.LENGTH_SHORT).show();
         } else {
             new Thread() {
@@ -282,7 +285,7 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
                         OutputStream os = s.getOutputStream();
 
                         String sendReportEntity = null;
-                        sendReportEntity = new Report("党员管理", getEditText, "2019/4/29", 123, "", "" )+ "\r\n";
+                        sendReportEntity = new Report("党员管理", getEditText, "2019/4/29", 123, "", "") + "\r\n";
                         os.write(sendReportEntity.getBytes());
                         // 发送Handler，判断文本发送是否完成
                         handler.sendEmptyMessage(TEXT_SEND_FINISHED);
