@@ -111,6 +111,20 @@ public class BitmapUtils {
         return saveMyBitmap(filename, image);
     }
 
+    /**
+     * 根据路径转化为Bitmap对象
+     *
+     * @param pathString
+     * @return
+     */
+    public static Bitmap getBitMap(String pathString) {
+        Bitmap bitmap = null;
+        File file = new File(pathString);
+        if (file.exists()) {
+            bitmap = BitmapFactory.decodeFile(pathString);
+        }
+        return bitmap;
+    }
 
     /**
      * 清除缓存文件

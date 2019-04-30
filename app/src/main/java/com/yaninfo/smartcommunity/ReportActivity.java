@@ -24,12 +24,9 @@ import com.yaninfo.smartcommunity.uploadEvent.BitmapUtils;
 import com.yaninfo.smartcommunity.uploadEvent.GlideImageLoader;
 import com.yaninfo.smartcommunity.uploadEvent.SelectDialog;
 import com.yaninfo.smartcommunity.util.CommonUtil;
-
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -96,7 +93,6 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
         setContentView(R.layout.layout_report);
 
         editText = findViewById(R.id.editText);
-        getEditText = editText.getText().toString();
 
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
 

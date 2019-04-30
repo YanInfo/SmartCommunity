@@ -11,7 +11,8 @@ import java.io.Serializable;
 
 public class Report implements Serializable {
 
-    private static final long serialVersionUID = 12L;
+
+    private static final long serialVersionUID = 2796051179715170058L;
 
     private int id;
     private String title;
