@@ -53,7 +53,6 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
     private ImagePickerAdapter adapter;
     // 当前选择的所有图片
     private ArrayList<ImageItem> mSelectImageList;
-    private EditText editText;
     // 允许选择图片最大数
     private int maxImgCount = 8;
     // 当前选择的图片数量
@@ -63,7 +62,17 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
     // 上传的Bitmap对象
     private Bitmap mBitmap = null;
 
-    private String getEditText;
+    // 事件标题
+    private String getTitle;
+    private EditText text_title;
+
+    // 事件文本
+    private String getTime;
+    private EditText text_time;
+
+    // 事件文本
+    private String getContent;
+    private EditText text_content;
 
     /**
      * 这里保证图片上传完成之后，再上传文本
@@ -92,13 +101,18 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_report);
 
-        editText = findViewById(R.id.editText);
+        text_content = findViewById(R.id.text_content);
 
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                getEditText = editText.getText().toString();
+                // 标题
+                getTitle = text_title.getText().toString();
+                // 时间
+                getTime = text_time.getText().toString();
+                // 文本
+                getContent = text_content.getText().toString();
                 uploadImage(mSelectImageList);
             }
         });
@@ -160,7 +174,8 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
                                 //打开选择,本次允许选择的数量
                                 ImagePicker.getInstance().setSelectLimit(maxImgCount - mSelectImageList.size());
                                 Intent intent = new Intent(ReportActivity.this, ImageGridActivity.class);
-                                intent.putExtra(ImageGridActivity.EXTRAS_TAKE_PICKERS, true); // 是否是直接打开相机
+                                // 是否是直接打开相机
+                                intent.putExtra(ImageGridActivity.EXTRAS_TAKE_PICKERS, true);
                                 startActivityForResult(intent, REQUEST_CODE_SELECT);
                                 break;
                             case 1:
@@ -269,7 +284,7 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
      * 上传文本线程
      */
     public void sendandText() {
-        if (getEditText.equals("")) {
+        if (getTitle.equals("") || getTime.equals("") || getContent.equals("")) {
             Toast.makeText(ReportActivity.this, "发送信息不能为空", Toast.LENGTH_SHORT).show();
         } else {
             new Thread() {
@@ -277,11 +292,10 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
                 public void run() {
                     try {
                         Socket s = new Socket("192.168.94.110", 30001);
-                        // BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
                         OutputStream os = s.getOutputStream();
 
                         String sendReportEntity = null;
-                        sendReportEntity = new Report("党员管理", getEditText, "2019/4/29", 123, "", "") + "\r\n";
+                        sendReportEntity = new Report("党员管理", getContent, "2019/4/29", 123, "", "") + "\r\n";
                         os.write(sendReportEntity.getBytes());
                         // 发送Handler，判断文本发送是否完成
                         handler.sendEmptyMessage(TEXT_SEND_FINISHED);

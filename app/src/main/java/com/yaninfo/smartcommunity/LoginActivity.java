@@ -17,14 +17,13 @@ import android.widget.Toast;
 
 import com.yaninfo.smartcommunity.util.HttpLoginData;
 
-
 import java.net.MalformedURLException;
 import java.net.URL;
 
 
 /**
  * @author zhangyan
- * @data 2019/1/10
+ * @data 2019/4/10
  */
 public class LoginActivity extends Activity {
 
@@ -34,8 +33,7 @@ public class LoginActivity extends Activity {
     private Button register;
     private SharedPreferences pref;
     private CheckBox rembemberPass;
-    public static final String TAG = "LoginActivity";
-    private static final String URLLOGIN = "http://192.168.94.110:8080/login/json/data";
+    private static final String URLLOGIN = "http://192.168.0.104:8088/client/login1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +42,10 @@ public class LoginActivity extends Activity {
         setContentView(R.layout.layout_login);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
 
-        //绑定控件
+        // 绑定控件
         init();
 
-        //记住密码
+        // 记住密码
         boolean isRemember = pref.getBoolean("remember_password", false);
         if (isRemember) {
             String user1 = pref.getString("user", "");
@@ -58,9 +56,8 @@ public class LoginActivity extends Activity {
         }
 
         login.setOnClickListener(new View.OnClickListener() {
-            @Override
 
-            //登录按键的响应
+            @Override
             public void onClick(View v) {
 
                 // 存储用户名密码的数组
@@ -69,12 +66,11 @@ public class LoginActivity extends Activity {
                 final String inputUser = user.getText().toString();
                 final String inputPassword = password.getText().toString();
 
-               /* if (TextUtils.isEmpty(inputUser)) {
+                if (TextUtils.isEmpty(inputUser)) {
                     Toast.makeText(LoginActivity.this, "请输入用户名", Toast.LENGTH_SHORT).show();
                 } else if (TextUtils.isEmpty(inputPassword)) {
                     Toast.makeText(LoginActivity.this, "请输入密码", Toast.LENGTH_SHORT).show();
-                } else*/
-                {
+                } else {
                     // Handler内部类更新UI
                     @SuppressLint("HandlerLeak") Handler handler = new Handler() {
                         @Override

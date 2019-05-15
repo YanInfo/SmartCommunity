@@ -10,8 +10,8 @@ import android.widget.ImageView;
 
 import com.lzy.imagepicker.ImagePicker;
 import com.lzy.imagepicker.bean.ImageItem;
-import com.yaninfo.smartcommunity.ReportActivity;
 import com.yaninfo.smartcommunity.R;
+import com.yaninfo.smartcommunity.ReportActivity;
 
 import java.util.ArrayList;
 import java.util.List;

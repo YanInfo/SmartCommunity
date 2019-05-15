@@ -24,7 +24,6 @@ public class SocketServer {
 
     public static void main(String[] args) {
         openPort();
-
     }
 
     private static void openPort() {
