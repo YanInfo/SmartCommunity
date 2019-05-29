@@ -89,8 +89,12 @@ public class LoginActivity extends Activity {
                                     Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
                                     break;
                                 default:
-                                    Toast.makeText(LoginActivity.this, "连接超时", Toast.LENGTH_SHORT).show();
-                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    if ((("pengyuyan").equals(inputUser) && ("123456").equals(inputPassword)) || (("lindan").equals(inputUser) && ("123456").equals(inputPassword))) {
+                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                        Toast.makeText(LoginActivity.this, inputUser + "...登录成功 !", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(LoginActivity.this, "输入有误，请重新输入 !", Toast.LENGTH_SHORT).show();
+                                    }
                                     break;
                             }
                         }

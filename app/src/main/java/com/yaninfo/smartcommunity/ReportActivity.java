@@ -13,20 +13,22 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.dangjian.project.system.report.domain.Report;
 import com.lzy.imagepicker.ImagePicker;
 import com.lzy.imagepicker.bean.ImageItem;
 import com.lzy.imagepicker.ui.ImageGridActivity;
 import com.lzy.imagepicker.ui.ImagePreviewDelActivity;
 import com.lzy.imagepicker.view.CropImageView;
-import com.yaninfo.smartcommunity.Entity.Report;
 import com.yaninfo.smartcommunity.adapter.ImagePickerAdapter;
 import com.yaninfo.smartcommunity.uploadEvent.BitmapUtils;
 import com.yaninfo.smartcommunity.uploadEvent.GlideImageLoader;
 import com.yaninfo.smartcommunity.uploadEvent.SelectDialog;
 import com.yaninfo.smartcommunity.util.CommonUtil;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -67,10 +69,6 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
     private EditText text_title;
 
     // 事件文本
-    private String getTime;
-    private EditText text_time;
-
-    // 事件文本
     private String getContent;
     private EditText text_content;
 
@@ -101,6 +99,7 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_report);
 
+        text_title = findViewById(R.id.text_title);
         text_content = findViewById(R.id.text_content);
 
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
@@ -109,10 +108,9 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
             public void onClick(View v) {
                 // 标题
                 getTitle = text_title.getText().toString();
-                // 时间
-                getTime = text_time.getText().toString();
                 // 文本
                 getContent = text_content.getText().toString();
+                // 上传图片集合
                 uploadImage(mSelectImageList);
             }
         });
@@ -171,7 +169,7 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         switch (position) {
                             case 0: // 直接调起相机
-                                //打开选择,本次允许选择的数量
+                                // 打开选择,本次允许选择的数量
                                 ImagePicker.getInstance().setSelectLimit(maxImgCount - mSelectImageList.size());
                                 Intent intent = new Intent(ReportActivity.this, ImageGridActivity.class);
                                 // 是否是直接打开相机
@@ -260,7 +258,7 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
         @Override
         public void run() {
             try {
-                Socket s = new Socket("192.168.94.110", 30003);
+                Socket s = new Socket("192.168.0.109", 30002);
                 OutputStream os = s.getOutputStream();
                 // 将图片bitmap转换成字节数组
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -284,19 +282,20 @@ public class ReportActivity extends AppCompatActivity implements ImagePickerAdap
      * 上传文本线程
      */
     public void sendandText() {
-        if (getTitle.equals("") || getTime.equals("") || getContent.equals("")) {
+        if (getTitle.equals("") || getContent.equals("")) {
             Toast.makeText(ReportActivity.this, "发送信息不能为空", Toast.LENGTH_SHORT).show();
         } else {
             new Thread() {
                 @Override
                 public void run() {
                     try {
-                        Socket s = new Socket("192.168.94.110", 30001);
-                        OutputStream os = s.getOutputStream();
 
-                        String sendReportEntity = null;
-                        sendReportEntity = new Report("党员管理", getContent, "2019/4/29", 123, "", "") + "\r\n";
-                        os.write(sendReportEntity.getBytes());
+                        Socket socket = new Socket("192.168.0.109", 30001);
+
+                        ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                        Report report = new Report(33, getTitle, getContent, "", "", "");
+                        oos.writeObject(report);
+
                         // 发送Handler，判断文本发送是否完成
                         handler.sendEmptyMessage(TEXT_SEND_FINISHED);
                     } catch (IOException e) {

@@ -30,7 +30,7 @@
         <activity android:name=".RegisterActivity"/>
 
         <activity android:name=".ReportActivity"
-            android:label="@string/app_name"/>
+            android:label="@string/app_report" />
 
         <activity
             android:name="com.lzy.imagepicker.ui.ImagePreviewDelActivity"

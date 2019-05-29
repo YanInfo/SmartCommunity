@@ -31,6 +31,7 @@ public class SocketServer {
          * 收发文字
          */
         new Thread() {
+            @Override
             public void run() {
                 try {
                     ServerSocket ss = new ServerSocket(30001);
@@ -69,6 +70,7 @@ public class SocketServer {
          * 发送图片
          */
         new Thread() {
+            @Override
             public void run() {
                 try {
                     ServerSocket server = new ServerSocket(30002);
@@ -101,6 +103,7 @@ public class SocketServer {
          * 接收图片
          */
         new Thread() {
+            @Override
             public void run() {
                 try {
                     ServerSocket ss = new ServerSocket(30003);

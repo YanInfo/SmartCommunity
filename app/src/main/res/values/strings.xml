@@ -25,6 +25,7 @@
     <string name="login_third">使用第三方登录</string>
 
     <!--上报-->
+    <string name="report_title">请输入上报标题</string>
     <string name="report_name">请输入上报内容</string>
     <string name="report_commit">上传</string>
 
